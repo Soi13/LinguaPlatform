@@ -1,0 +1,1 @@
+Video platform for language center Lingua-Terra which allows to conduct lessons. Platform uses Vonage API (https://www.vonage.com/) as a video server and Limnu API (https://limnu.com/) for whiteboard.
