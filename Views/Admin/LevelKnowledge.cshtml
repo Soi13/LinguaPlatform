@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Level of knowledge";
+    Layout = "~/Views/Shared/_Layout_admin.cshtml";
+}
+
+@Html.AntiForgeryToken()
+
+<table id="dg_level_knowledge" title="Levels of knowlenge" class="easyui-datagrid" style="width:100%;height:100%"
+       method="get"
+       url="/Admin/GetLevelKnowledge"
+       toolbar="#toolbar"
+       rownumbers="true" fitColumns="true" singleSelect="true" pagination="true" sortName="Name" sortOrder="asc" idField="Id" striped=true>
+
+    <thead>
+        <tr>
+            <th field="Id" width="15" hidden="true">ID1</th>
+            <th field="Name" width="150" sortable="true">Name</th>
+            <th field="Blocked" width="150" formatter="formatStatus">Status</th>
+        </tr>
+    </thead>
+</table>
+<div id="toolbar">
+    <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newLevelKnowledge()">Add new level</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editLevelKnowledge()">Edit level</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="delLevelKnowledge()">Delete level</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-tip" plain="true" onclick="hide_show()">Hide/Show</a>
+</div>
+
+<!--Form for adding a new level of knowledge -->
+<div id="new_level_knowledge" class="easyui-dialog" style="width:500px;height:220px;padding:10px 1px;"
+     closed="true" buttons="#dlg-buttons" data-options="openDuration:400, closeDuration:400, closeAnimation:'fade', openAnimation:'fade'">
+    <div class="ftitle"><span id="tit">Add a new level of knowledge</span></div>
+    <form id="fm">
+        <div class="fitem">
+            <label>Name of level:</label>
+            <input id="Name" name="Name" class="easyui-textbox" required missingMessage="This field must be filled.">
+        </div>
+    </form>
+</div>
+<div id="dlg-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveLevelKnowledge()" style="width:100px">Ok</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#new_level_knowledge').dialog('close')" style="width:90px">Cancel</a>
+</div>
+<!-- End of Form for adding a new level of knowledge -->

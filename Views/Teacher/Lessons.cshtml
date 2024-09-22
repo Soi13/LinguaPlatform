@@ -1,0 +1,123 @@
+﻿@{
+    ViewData["Title"] = "Teacher - Lessons";
+    Layout = "~/Views/Shared/_Layout_teacher.cshtml";
+}
+
+@Html.AntiForgeryToken()
+
+@if (User.Identity.IsAuthenticated)
+{
+
+    <input id="GrLes" name="GrLes" class="easyui-combobox" label="Select group for lesson:" style="width:400px;" data-options="editable:false, valueField: 'id', textField: 'text', url: '/Teacher/LoadGroups4Lesson/', method: 'get'">
+    <br />
+    <hr>
+
+    <div id="inner_cont" class="easyui-layout" data-options="fit:true">
+        <div data-options="region:'west', split:true, minWidth:1" style="width:180px; vertical-align:top;">
+
+            <iframe id="whiteboard" src="" style="height: 93%; width: 100%; border: none;" scrolling="no"></iframe>
+
+        </div>
+
+        <div data-options="region:'center'">
+            <div id="share_subscriber">
+                <div id="share_sub"></div>
+            </div>
+
+            <div id="share_publisher">
+                <div id="share_pub"></div>
+            </div>
+
+        </div>
+    </div>
+
+
+    @section Eastern_panel {
+        <div data-options="region:'east', split:true" style="padding:5px;background:#eee; width:20%;">
+
+            <div id="video2">
+                <div id="publisher"></div>
+            </div>
+
+            <div class="easyui-tabs" style="width:100%; height:auto;" data-options="narrow:true, fit:true">
+                <div title="Group">
+
+                    <div id="video1">
+                        <div id="subscriber"></div>
+                    </div>
+
+
+                </div>
+                <div title="Chat">
+
+                </div>
+            </div>
+        </div>
+    }
+
+    @section Southern_panel {
+        <div data-options="region:'south', split:true" style="padding:5px;background:#eee; height:10%;">
+
+            <!--<div id="share_publisher">
+              <div id="share_pub"></div>
+            </div>  -->
+
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
+                <div class="container">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+
+                            <ul class="navbar-nav flex-grow-1">
+                                <li class="nav-item">
+                                    <a id="conn_but" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="conncect2Session()">Connect to lesson</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-raise-hand', disabled:true" onclick="raiseHand()">Raise hand</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a id="mic" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-microphone', toggle:true, disabled:true" onclick="">Microphone</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a id="cam" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-video-camera', toggle:true, disabled:true" onclick="">Camera</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a id="shr_but" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-sharing', disabled:true" onclick="shareScreen()">Share screen</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a id="brd_but" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-board', disabled:true" onclick="openBoard()">Open whiteboard</a>
+                                </li>                              
+                                <li class="nav-item">
+                                    <a id="discon_but" style="margin-left: 50px; width:100px;" href="#" class="easyui-linkbutton c5" data-options="iconCls:'icon-remove'" onclick="disconnectFromSession()">Exit</a>
+                                </li>
+                            </ul>
+
+                    </div>
+
+                    <!--   <div style="padding:10px 10px; margin-left:30%;">
+            <a id="conn_but" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="conncect2Session()">Connect to lesson</a>
+            <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-raise-hand', disabled:true" onclick="raiseHand()">Raise hand</a>
+            <a id="mic" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-microphone', toggle:true, disabled:true" onclick="">Microphone</a>
+            <a id="cam" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-video-camera', toggle:true, disabled:true" onclick="">Camera</a>
+            <a id="shr_but" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-sharing', disabled:true" onclick="shareScreen()">Share screen</a>
+            <a id="brd_but" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-board', disabled:true" onclick="openBoard()">Open whiteboard</a>
+            <a id="discon_but" style="margin-left: 50px; width:100px;" href="#" class="easyui-linkbutton c5" data-options="iconCls:'icon-remove'" onclick="disconnectFromSession()">Exit</a>
+            </div> -->
+                </div>
+            </nav>
+
+        </div>
+    }
+
+
+
+    <script>
+        $(function () {
+            makeCloseWestPanel();
+        });
+    </script>
+
+
+}

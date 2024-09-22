@@ -1,0 +1,121 @@
+﻿@model LinguaPlatform.Models.Login;
+@{
+    ViewData["Title"] = "Lingua-terra educational platform";
+    Layout = null;
+}
+@Html.AntiForgeryToken();
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=11">
+    <meta http-equiv="X-UA-Compatible" content="IE=10">
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta http-equiv="X-UA-Compatible" content="IE=8">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/easyui.css">
+    <link rel="stylesheet" type="text/css" href="~/css/icon.css">
+    <link rel="stylesheet" type="text/css" href="~/css/demo.css">
+    <link rel="stylesheet" type="text/css" href="~/css/color.css">
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css">
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!-- <script src="~/js/jquery.min.js"></script>  -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/jquery.easyui.min.js"></script>
+
+
+    <script>
+        function open_window_add_period_pay() {
+            $('#dlg_window_login_reg').dialog('open').dialog('center').dialog('setTitle', '');
+        }
+    </script>
+
+    <script>
+        function submit() {           
+                $.ajax({
+                    type: "POST",
+                    url: '/Account/Login/',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: JSON.stringify({ 'Email': $('#Email').textbox('getValue'), 'Password': $('#Password').passwordbox('getValue'), 'RememberMe': $('#RememberMe:checked').val() }),
+                    contentType: "application/json",
+                    traditional: true,
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.text == true) {
+                            var link = '@Url.Action("Index", "Home")';
+                            window.location.href = link;
+                        }
+                        else {
+                            $('#Email').textbox('clear');
+                            $('#Password').passwordbox('clear');                          
+                            $('#s_err').append('<hr>');
+                            $('#err').text(res.text);                          
+                    
+                        }
+                    }, error: function () { alert("Did not work"); }
+                });
+        }
+    </script>
+
+    
+</head>
+<body class="easyui-layout">
+
+    <div data-options="region:'north'" style="height:50px;">
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-login'" style="margin-top:10px; margin-right:50px; float:right;" onclick="open_window_add_period_pay()">LOGIN</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-phone'" style="margin-top:10px; margin-right:10px; float:right;">CONTACTS</a>
+        <div style="margin-top:15px; margin-right:20px; float:right; font-weight:bold">+1 (408) 667-2985</div>
+        <div style="margin-top:12px; margin-left:45%; position:absolute; font-weight:bold; font-size: 25px;">Lingua-Terra</div>
+    </div>
+
+    <div data-options="region:'center'" style="padding:5px;background:#eee;">
+    </div>
+
+    <!-- Form Login -->
+    <div id="dlg_window_login_reg" class="easyui-dialog" style="width:310px;height:450px;"
+         closed="true" modal="true" cache="false" noheader="false" data-options="openDuration:400, closeDuration:400, closeAnimation:'fade', openAnimation:'fade'">
+        <div style="padding:20px">
+           <!-- <form method="post" asp-route-returnUrl="@Model.ReturnUrl"> -->
+           <!--     <div asp-validation-summary="ModelOnly"></div> -->
+                <div class="fitem" style="margin-top:30px;">
+                    <input id="Email" name="Email" class="easyui-textbox" prompt="E-mail" data-options="iconCls:'icon-mail'" autocomplete="off">
+                    <span asp-validation-for="Email"></span>
+                </div>
+                <div class="fitem">
+                    <input id="Password" name="Password" class="easyui-passwordbox" prompt="Your password">
+                    <span asp-validation-for="Password"></span>
+                </div>                
+                <div>
+                    <input type="checkbox" id="RememberMe" name="RememberMe" value="true">
+                    <label for="RememberMe">Remember me</label><br />
+                </div>
+                <div style="text-align:center; margin-top:30px;">
+                    <a id="login" href="#" class="easyui-linkbutton" onclick="submit()" data-options="iconCls:'icon-ok'" style="width:200px;">OK</a>                    
+                </div>
+                <div style="text-align:center; margin-top:10px;">
+                    <a href="@Url.ActionLink("ForgotPassword", "Account")">Forgot password?</a>                    
+                </div>
+                <div style="margin-top:20px; text-align:center;">
+                    <span id="s_err"></span>
+                    <span id="err" style="font-weight:500; color:red;"></span>
+                </div>
+
+         <!--   </form>   -->
+        </div>
+     </div>
+        <!-- End Form Login -->
+
+
+</body>
+
+
+</html>

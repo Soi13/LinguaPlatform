@@ -1,0 +1,95 @@
+﻿@{
+    ViewData["Title"] = "Sudent - personal data";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.AntiForgeryToken()
+
+@if (User.Identity.IsAuthenticated)
+{
+
+<div style="margin-left:5%">
+    <div class="ftitle" style="color:#0000ff; font-size:20pt;">Personal data</div>
+    <div class="fitem">
+        <label style="color:#0000ff; font-size:16pt;">Name:</label>
+        <input id="Name" name="Name" style="width:400px; height:40px;" class="easyui-textbox" required missingMessage="This field must be filled.">
+    </div>
+    <div class="fitem">
+        <label style="color:#0000ff; font-size:16pt;">Surname:</label>
+        <input id="Surname" name="Surname" style="width:400px; height:40px;" class="easyui-textbox" required missingMessage="This field must be filled.">
+    </div>
+    <div class="fitem">
+        <label style="color:#0000ff; font-size:16pt;">Date of birth:</label>
+        <input id="DateOfBirth" name="DateOfBirth" style="width:400px; height:40px;" class="easyui-datebox" data-options="required:true, formatter:myformatter, parser:myparser" required missingMessage="This field must be filled.">
+    </div>
+    <div class="fitem">
+        <label style="color:#0000ff; font-size:16pt;">Gender:</label>
+        <input id="Gender" name="Gender" style="width:400px; height:40px;" class="easyui-combobox" data-options="editable:false, required:true, panelHeight:'auto', valueField: 'id', textField: 'text', data: [{id:1, text:'M'}, {id:2, text:'F'}]" missingMessage="This field must be filled.">
+    </div>
+    <div class="fitem">
+        <label style="color:#0000ff; font-size:16pt;">City:</label>
+        <input id="City" name="City" style="width:400px; height:40px;" class="easyui-textbox" required missingMessage="This field must be filled.">
+    </div>
+
+
+    <div id="buttons_safe" style="margin-left:10%; margin-top:50px;">
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="savePersonalData()" style="width:200px">Save</a>
+    </div>
+</div>
+
+     <hr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        @section GetUsrData {
+            <script>
+                $(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: '/Home/GetUserData/',
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN",
+                                $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        contentType: "application/json",
+                        traditional: true,
+                        dataType: "json",
+                        success: function (res) {
+                            $('#Name').textbox('setValue', res.name);
+                            $('#Surname').textbox('setValue', res.surname);
+                            $('#DateOfBirth').datebox('setValue', res.dob);
+                            $('#Gender').combobox('setValue', res.gender);
+                            $('#City').textbox('setValue', res.city);    
+                        }, error: function () { alert("Did not work"); }
+                    });
+                })
+            </script>
+
+        }
+
+
+
+
+
+        }
+
+

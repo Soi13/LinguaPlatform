@@ -1,0 +1,533 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - LinguaPlatform</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=11">
+    <meta http-equiv="X-UA-Compatible" content="IE=10">
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta http-equiv="X-UA-Compatible" content="IE=8">   
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/easyui.css?v=1">
+    <link rel="stylesheet" type="text/css" href="~/css/icon.css">
+    <link rel="stylesheet" type="text/css" href="~/css/demo.css">
+    <link rel="stylesheet" type="text/css" href="~/css/color.css">
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="~/css/app.css">
+    <link rel="stylesheet" type="text/css" href="~/css/containers.css">
+
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/jquery.easyui.min.js"></script>
+    <script src="~/js/script.js"></script>
+    <script src="~/js/checkbrowser.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
+    <script src="~/js/opentok-layout.js"></script>
+    <script src="~/js/microsoft/signalr/dist/browser/signalr.js"></script>
+
+
+    <script>
+        function confirm1() {
+            $.messager.confirm('Attention!', 'Are you sure you want to exit?', function (r) {
+                if (r) {
+
+                      $.ajax({
+                    type: "POST",
+                    //url: '/Account/Logout/',
+                    url: '@Url.Action("Logout", "Account")',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    contentType: "application/json",
+                    traditional: true,
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.text == true) {
+                            var link = '@Url.ActionLink("Login", "Account")';
+                            window.location.href = link;
+
+                        }
+                        else {
+                            $.messager.alert('Information', res.text, 'info');
+                        }
+                    }, error: function () { alert("Did not work"); }
+                });
+
+                }
+            });
+        }
+    </script>
+
+
+    <script type="text/javascript">
+        function myformatter(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            var d = date.getDate();
+            return y + '-' + (m < 10 ? ('0' + m) : m) + '-' + (d < 10 ? ('0' + d) : d);
+        }
+        function myparser(s) {
+            if (!s) return new Date();
+            var ss = (s.split('-'));
+            var y = parseInt(ss[0], 10);
+            var m = parseInt(ss[1], 10);
+            var d = parseInt(ss[2], 10);
+            if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+                return new Date(y, m - 1, d);
+            } else {
+                return new Date();
+            }
+        }
+    </script>
+
+
+    <script>
+        function conncect2Session() {
+
+            $.ajax({
+                type: "POST",
+                url: '/Home/Connect2Session/',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                contentType: "application/json",
+                traditional: true,
+                dataType: "json",
+                success: function (res) {
+                    if (!res.result) {
+                        $.messager.alert("Attention", "Your teacher still haven't connected to lesson. Please wait.", "warning");
+                    }
+                    else {
+                        initializeSession(res.apiKey, res.sessionId, res.token, res.fullUserName);
+                    }
+                }, error: function () { alert("Did not work"); }
+            });
+
+        }
+    </script>
+
+
+
+    <script>
+        function disconnectFromSession() {
+            $.messager.confirm('Attention!', 'Are you sure you want to disconnect?', function (r) {
+                if (r) {
+                    if (session != null) {
+                        console.log("unsubscribe");
+                        $.ajax({
+                            type: "POST",
+                            url: '/Home/DisconnectFromSession/',
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("XSRF-TOKEN",
+                                    $('input:hidden[name="__RequestVerificationToken"]').val());
+                            },
+                            contentType: "application/json",
+                            traditional: true,
+                            dataType: "json",
+                            success: function (res) {
+                                //session.unsubscribe(subscriber)
+                                //session.unpublish(publisher)
+                                session.disconnect();
+                                subscribed = [];                                
+                                st = false;
+                                $("#conn_but").linkbutton('enable');
+                                $("#discon_but").linkbutton().hide();
+                                $("#mic").linkbutton('disable');
+                                $("#cam").linkbutton('disable');
+                                $("#shr_but").linkbutton('disable');
+                            }, error: function () { alert("Did not work"); }
+                        });
+                    }
+                }
+            });
+
+        }
+    </script>
+
+
+    <script>
+        function disconTeachAbnormally() {
+            $.ajax({
+                type: "POST",
+                url: '/Home/DisconnetTeacherAbnormally/',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                contentType: "application/json",
+                traditional: true,
+                dataType: "json",
+                success: function (res) {
+
+                }, error: function () { alert("Did not work"); }
+            });
+        }
+    </script>
+
+
+    <script>
+        //Handling all of our errors here by alerting them
+        function handleError(error) {
+            if (error) {
+                $.messager.alert('Attention', error.message, 'error');
+            }
+        }
+    </script>
+
+
+    <script>
+        let session;
+        let st = false;
+        let publisher;
+        let subscriber;
+        let subscribed = [];
+        let teacherId;
+        let full_us_name;
+
+        /////////Initialize session
+        function initializeSession(apiKey, sessionId, token, fullUserName) {
+            if (st) {
+                $.messager.alert("Attention", "You've already connected to lesson!", "info");
+                return;
+            }
+
+            if (fullUserName.length > 0) {
+                full_us_name = fullUserName;
+            }
+            else {
+                full_us_name = "Student";
+            }
+
+            session = OT.initSession(apiKey, sessionId);
+
+            var layoutContainer = document.getElementById("subscriber");
+            var layout = initLayoutContainer(layoutContainer).layout;
+
+            session.on('streamCreated', function (event) {
+                console.log("sessionCreated", event.stream.id, subscribed);
+
+                if (subscribed.includes(event.stream.id)) {
+                    console.log("Subscriber already exits.", subscriber.id);
+                    return;
+                }
+
+
+                if (event.stream.videoType === 'screen') {
+                    session.subscribe(event.stream, 'share_sub', {
+                        insertMode: 'append',
+                        width: '100%',
+                        height: '100%'
+                    }, handleError);
+                    makeCloseWestPanel();
+                    $("#share_sub").attr("style", "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(136, 136, 204, 0.5); z-index: 4444;");
+
+                } else if (event.stream.id == teacherId) {
+                    session.subscribe(event.stream, 'publisher', {
+                        insertMode: 'append',
+                        width: '100%',
+                        height: '100%'
+                    }, handleError);
+                    layout();
+                } else {
+                    //Возможно event.stream это массив. Проверить.
+                    session.subscribe(event.stream, 'subscriber', {
+                        insertMode: 'append',
+                        width: '100%',
+                        height: '100%'
+                    }, handleError);
+                    layout();
+                }
+
+                subscribed.push(event.stream.id);
+
+
+            });
+
+
+            session.on("connectionDestroyed", function (event) {
+                var data = event.connection.data;
+                var status = data.split(",");
+                var str_status = status[1].split("=");
+                if (str_status[1] == "teacher") {
+                    $.ajax({
+                        type: "POST",
+                        url: '/Home/DisconnectFromSession/',
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN",
+                                $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        contentType: "application/json",
+                        traditional: true,
+                        dataType: "json",
+                        success: function (res) {
+                            session.disconnect();
+                            st = false;
+                            $("#conn_but").linkbutton('enable');
+                            $("#discon_but").linkbutton().hide();
+                            $("#mic").linkbutton('disable');
+                            $("#cam").linkbutton('disable');
+                            $("#shr_but").linkbutton('disable');
+                            makeCloseWestPanel();
+                            disconTeachAbnormally();
+                            $.messager.alert("Attention", "You were disconnected since your teacher has left the lesson!", "info");
+                        }, error: function () { alert("Did not work"); }
+                    });
+
+                }
+
+            });
+
+
+            session.on("streamDestroyed", function (event) {
+                $("#share_sub").attr("style", "");
+                console.log("streamDestroyed", "Unsubscribe");
+                session.unsubscribe(subscriber);
+            })
+
+            session.on('sessionDisconnected', function (event) {
+                console.log("sessionDisconnected");
+                // session.unsubscribe(subscriber)
+                // event.preventDefault()
+            });
+
+
+            // Create a publisher
+            publisher = OT.initPublisher('subscriber', {
+                insertMode: 'append',
+                width: '100%',
+                height: '100%',
+                name: full_us_name
+            }, handleError);
+
+            publisher.setStyle({ nameDisplayMode: "on" });
+
+
+            // Connect to the session
+            session.connect(token, function (error) {
+                if (error) {
+                    handleError(error);
+                } else {
+                    session.publish(publisher, handleError);
+                    layout();
+                    st = true;
+                    $("#discon_but").linkbutton().show();
+                    $("#conn_but").linkbutton('disable');
+                    $("#mic").linkbutton('enable');
+                    $("#cam").linkbutton('enable');
+                    $("#shr_but").linkbutton('enable');
+                }
+            });
+
+
+        }
+        ////////////////////////////////////////////
+
+
+        ///////////////Share screen
+        function shareScreen() {
+            if (!st) {
+                $.messager.alert("Attention", "Since you haven't connected to lessos you can't use screen sharing!", "info");
+                return;
+            }
+
+            OT.checkScreenSharingCapability(function (response) {
+                if (!response.supported || response.extensionRegistered === false) {
+                    $.messager.alert('Information', "This browser does not support screen sharing.", 'warning');
+                } else if (response.extensionInstalled === false) {
+                    $.messager.alert('Information', "You have to install extension for using screen sharing.", 'warning');
+                } else {
+                    var publisher = OT.initPublisher('share_pub',
+                        { videoSource: 'screen', insertMode: "append", width: "100%", height: "100%" },
+                        function (error) {
+                            if (error) {
+                                //handleError(error);
+                            } else {
+                                session.publish(publisher, handleError);
+
+                            }
+                        }
+                    );
+                }
+            });
+
+
+        }
+        /////////////////////////////////////////////////////////
+    </script>
+
+
+    <script>
+        function savePersonalData() {
+            var dob = $('#DateOfBirth').datebox('getValue');
+
+            if (dob.length == 0) {
+                $.messager.alert("Attention", "Date of birth cant'be empty.", "warning");
+                return;
+            }
+
+            var myRegex = /^\d{4}([./-])\d{2}\1\d{2}$/;
+            var check_date = dob.match(myRegex);
+            if (!check_date) {
+                $.messager.alert("Attention", "Incorrect format of date.", "warning");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '/Home/SaveUserData/',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: JSON.stringify({ 'Name': $('#Name').textbox('getValue'), 'Surname': $('#Surname').textbox('getValue'), 'DateOfBirth': $('#DateOfBirth').datebox('getValue'), 'Gender': $('#Gender').combobox('getText'), 'City': $('#City').textbox('getValue') }),
+                contentType: "application/json",
+                traditional: true,
+                dataType: "json",
+                success: function (res) {
+                    $.messager.alert("Information", res.text, "info");
+                }, error: function () { alert("Did not work"); }
+            });
+
+        }
+
+    </script>
+
+
+    <script>
+        $(function () {
+            $("#mic").linkbutton({
+                onClick: function () {
+                    var opts = $(this).linkbutton('options');
+                    if (opts.selected) {
+                        $('#mic').linkbutton({ iconCls: 'icon-mute' });
+                        publisher.publishAudio(false);
+                    }
+                    else {
+                        $('#mic').linkbutton({ iconCls: 'icon-microphone' });
+                        publisher.publishAudio(true);
+                    }
+                }
+            })
+        })
+
+    </script>
+
+    <script>
+        $(function () {
+            $("#cam").linkbutton({
+                onClick: function () {
+                    var opts = $(this).linkbutton('options');
+                    if (opts.selected) {
+                        $('#cam').linkbutton({ iconCls: 'icon-no-video' });
+                        publisher.publishVideo(false);
+                    }
+                    else {
+                        $('#cam').linkbutton({ iconCls: 'icon-video-camera' });
+                        publisher.publishVideo(true);
+                    }
+                }
+            })
+        })
+
+    </script>
+
+    <script>
+        $(function () {
+            $("#discon_but").linkbutton().hide();
+        })
+    </script>
+
+
+    @if (IsSectionDefined("GetUsrData"))
+    {
+        @RenderSection("GetUsrData", required: true)
+    }
+
+    @if (IsSectionDefined("GetSignal"))
+    {
+        @RenderSection("GetSignal", required: true)
+    }
+
+
+
+
+</head>
+
+<body class="easyui-layout">
+
+    <div id="share_subscriber">
+        <div id="share_sub"></div>
+    </div>
+
+    <div data-options="region:'north',border:true" style="height: auto; background: #d7ebf9; padding: 10px; text-align:right;">
+        <span style="color:blue; font-size:10pt;">@User.Identity.Name</span>
+        <div class="btn_div" style="margin-left:10px;">
+            <a href="#" class="button" onClick="confirm1();">Logout</a>
+        </div>
+    </div>
+
+    <div data-options="region:'west', split:false" style="width:205px;">
+
+        <!--Display menu -->
+        <div id='cssmenu'>
+            <ul>
+                <li><a href='@Url.ActionLink("Profile", "Home")'><span>Personal profile</span></a></li>
+                <li><a href='@Url.ActionLink("Lessons", "Home")'><span>Lessons</span></a></li>
+                <li><a href='@Url.ActionLink("Materials", "Home")'><span>Training materials</span></a></li>
+
+                <!--   <li class='has-sub'>
+        <a href='#'><span>Main</span></a>
+        <ul>
+            <li><a href='@Url.ActionLink("Profile", "Home")'><span>Personal profile</span></a></li>
+            <li class='last'><a href='@Url.ActionLink("Lessons", "Home")'><span>Lessons</span></a></li>
+        </ul>
+    </li>
+    <li class='has-sub'>
+        <a href='#'><span>Training</span></a>
+        <ul>
+            <li><a href='#'><span>Video practice</span></a></li>
+            <li><a href='#'><span>Home tasks</span></a></li>
+            <li><a href='@Url.ActionLink("Tests", "Home")'><span>Tests</span></a></li>
+            <li class='last'><a href='#'><span>Word games</span></a></li>
+        </ul>
+    </li>
+    <li class='has-sub'>
+        <a href='#'><span>My program</span></a>
+        <ul>
+            <li><a href='#'><span>My notes</span></a></li>
+            <li><a href='#'><span>My dictionary</span></a></li>
+            <li class='last'><a href='#'><span>My portfolio</span></a></li>
+        </ul>
+    </li>
+    <li><a href='#'><span>Additionals</span></a></li> -->
+            </ul>
+        </div>
+
+    </div>
+
+    <div data-options="region:'center'" style="padding:5px;background:#eee;">
+        @RenderBody()
+    </div>
+
+
+    @if (IsSectionDefined("Eastern_panel"))
+    {
+        //Show details about group here in template if section Ge_details declared in view which use this template(Layout)
+        @RenderSection("Eastern_panel", required: true)
+    }
+
+    @if (IsSectionDefined("Southern_panel"))
+    {
+        //Show details about group here in template if section Ge_details declared in view which use this template(Layout)
+        @RenderSection("Southern_panel", required: true)
+    }
+
+</body>
+
+</html>

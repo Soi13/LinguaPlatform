@@ -1,0 +1,609 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - LinguaPlatform</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=11">
+    <meta http-equiv="X-UA-Compatible" content="IE=10">
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta http-equiv="X-UA-Compatible" content="IE=8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/easyui.css?v=1">
+    <link rel="stylesheet" type="text/css" href="~/css/icon.css">
+    <link rel="stylesheet" type="text/css" href="~/css/demo.css">
+    <link rel="stylesheet" type="text/css" href="~/css/color.css">
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="~/css/app.css">
+
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/jquery.easyui.min.js"></script>
+    <script src="~/js/script.js"></script>
+    <script src="~/js/checkbrowser.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+
+    <script>
+        function confirm1() {
+            $.messager.confirm('Attention!', 'Are you sure you want to exit?', function (r) {
+                if (r) {
+
+                      $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("Logout", "Account")',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    contentType: "application/json",
+                    traditional: true,
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.text == true) {
+                            var link = '@Url.ActionLink("Login", "Account")';
+                            window.location.href = link;
+
+                        }
+                        else {
+                            $.messager.alert('Information', res.text, 'info');
+                        }
+                    }, error: function () { alert("Did not work"); }
+                });
+
+                }
+            });
+        }
+    </script>
+
+    <script type="text/javascript">
+        var url, row;
+        function newLevelKnowledge() {
+            $('#tit').text("Add a new level of knowledge");
+            $('#new_level_knowledge').dialog('open').dialog('center').dialog('setTitle', 'New level of knowledge');
+            $('#fm').form('clear');
+            url = '/Admin/AddLevelKnowledge/';
+        }
+
+        function editLevelKnowledge() {
+            row = $('#dg_level_knowledge').datagrid('getSelected');
+            if (row) {
+                $('#tit').text("Edit level of knowledge");
+                $('#new_level_knowledge').dialog('open').dialog('center').dialog('setTitle', 'Edit level of knowledge');
+                $('#fm').form('load', row);
+                url = '/Admin/EditLevelKnowledge/';
+            }
+        }
+
+        function saveLevelKnowledge() {
+            //var msg = $('#fm').serialize();
+            if (row) {
+
+                msg = JSON.stringify({ 'Id': parseInt(row.Id), 'Name': $('#Name').textbox('getValue') });
+            }
+            else {
+                msg = JSON.stringify({ 'Name': $('#Name').textbox('getValue') });
+            }
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: msg,
+                contentType: "application/json",
+                traditional: true,
+                dataType: "json",
+                success: function (res) {
+                    $.messager.alert('Information', res.text, 'info');
+                    if (res.text == "Level of knowledge added successfully!") {
+                        $('#fm').form('clear'); $('#new_level_knowledge').dialog('close');
+                        $('#dg_level_knowledge').datagrid('reload');
+                    }
+                    if (res.text == "Level of knowledge edited successfully!") {
+                        $('#fm').form('clear'); $('#new_level_knowledge').dialog('close');
+                        $('#dg_level_knowledge').datagrid('reload');
+                    }
+
+                }, error: function () { alert("Did not work"); }
+            });
+        }
+
+        function delLevelKnowledge() {
+            $.messager.confirm('Attention!', 'Are you sure you want to delete level of knowledge?', function (r) {
+                if (r) {
+                    row = $('#dg_level_knowledge').datagrid('getSelected');
+                    if (row) {
+                        $.ajax({
+                            type: "POST",
+                            url: '/Admin/DelLevelKnowledge/',
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("XSRF-TOKEN",
+                                    $('input:hidden[name="__RequestVerificationToken"]').val());
+                            },
+                            data: JSON.stringify({ 'Id': parseInt(row.Id) }),
+                            contentType: "application/json",
+                            traditional: true,
+                            dataType: "json",
+                            success: function (res) {
+                                $.messager.alert('Information', res.text, 'info');
+                                if (res.text == "Level of knowledge has deleted successfully!") {
+                                    $('#dg_level_knowledge').datagrid('reload');
+                                }
+                            }, error: function () { alert("Did not work"); }
+                        });
+                    }
+                }
+            });
+        }
+    </script>
+
+
+    <script>
+        function formatStatus(val, row) {
+            if (val == 'True') {
+                return '<span style="color:red; font-weight:bold;">Invisible</span>';
+            } else {
+                return '<span style="color:green; font-weight:bold;">Visible</span>';
+            }
+        }
+    </script>
+
+
+    <script type="text/javascript">
+        var url1, row1;
+        function newKindLanguage() {
+            $('#tit').text("Add a new language");
+            $('#new_kind_language').dialog('open').dialog('center').dialog('setTitle', 'New language');
+            $('#fm').form('clear');
+            url1 = '/Admin/AddKindLanguage/';
+        }
+
+        function editKindLanguage() {
+            row1 = $('#dg_kind_languages').datagrid('getSelected');
+            if (row1) {
+                $('#tit').text("Edit language");
+                $('#new_kind_language').dialog('open').dialog('center').dialog('setTitle', 'Edit language');
+                $('#fm').form('load', row1);
+                url1 = '/Admin/EditKindLanguage/';
+            }
+        }
+
+        function saveKindLanguage() {
+            //var msg = $('#fm').serialize();
+            if (row1) {
+
+                msg = JSON.stringify({ 'Id': parseInt(row1.Id), 'Name': $('#Name').textbox('getValue') });
+            }
+            else {
+                msg = JSON.stringify({ 'Name': $('#Name').textbox('getValue') });
+            }
+
+            $.ajax({
+                type: "POST",
+                url: url1,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: msg,
+                contentType: "application/json",
+                traditional: true,
+                dataType: "json",
+                success: function (res) {
+                    $.messager.alert('Information', res.text, 'info');
+                    if (res.text == "Language added successfully!") {
+                        $('#fm').form('clear'); $('#new_kind_language').dialog('close');
+                        $('#dg_kind_languages').datagrid('reload');
+                    }
+                    if (res.text == "Language edited successfully!") {
+                        $('#fm').form('clear'); $('#new_kind_language').dialog('close');
+                        $('#dg_kind_languages').datagrid('reload');
+                    }
+
+                }, error: function () { alert("Did not work"); }
+            });
+        }
+
+        function delKindLanguage() {
+            $.messager.confirm('Attention!', 'Are you sure you want to delete language?', function (r) {
+                if (r) {
+                    row1 = $('#dg_kind_language').datagrid('getSelected');
+                    if (row1) {
+                        $.ajax({
+                            type: "POST",
+                            url: '/Admin/DelKindLanguage/',
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("XSRF-TOKEN",
+                                    $('input:hidden[name="__RequestVerificationToken"]').val());
+                            },
+                            data: JSON.stringify({ 'Id': parseInt(row.Id) }),
+                            contentType: "application/json",
+                            traditional: true,
+                            dataType: "json",
+                            success: function (res) {
+                                $.messager.alert('Information', res.text, 'info');
+                                if (res.text == "Language has deleted successfully!") {
+                                    $('#dg_kind_languages').datagrid('reload');
+                                }
+                            }, error: function () { alert("Did not work"); }
+                        });
+                    }
+                }
+            });
+        }
+    </script>
+
+
+    <script type="text/javascript">
+        var url2, row2;
+        function newGroup() {
+            $('#tit').text("Add a new group");
+            $('#new_group').dialog('open').dialog('center').dialog('setTitle', 'New group');
+            $('#fm').form('clear');
+            url2 = '/Admin/AddGroup/';
+        }
+
+        function editGroup() {
+            row2 = $('#dg_groups').datagrid('getSelected');
+            if (row2) {
+                $('#tit').text("Edit group");
+                $('#new_group').dialog('open').dialog('center').dialog('setTitle', 'Edit group');
+
+                ////Get data from Group for editing
+                $.ajax({
+                    type: "POST",
+                    url: '/Admin/GetGroup4Edit/',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: JSON.stringify({ 'Id': parseInt(row2.Id) }),
+                    contentType: "application/json",
+                    traditional: true,
+                    dataType: "json",
+                    success: function (res) {
+                        $('#GroupName').textbox('setValue', res.groupName);
+                        $('#IdKindLanguages').combobox('setValue', res.idKindLanguages);
+                        $('#IdLevelKnowledge').combobox('setValue', res.idLevelKnowledge);
+                        $('#MaxCountStudents').numberbox('setValue', res.maxCountStudents);
+                        $('#Notes').textbox('setValue', res.notes);
+                    }, error: function () { alert("Did not work"); }
+                });
+                ///////////////////
+
+                url2 = '/Admin/EditGroup/';
+            }
+        }
+
+        function saveGroup() {
+            //var msg = $('#fm').serialize();
+            if (row2) {
+
+                msg = JSON.stringify({ 'Id': parseInt(row2.Id), 'GroupName': $('#GroupName').textbox('getValue'), 'IdKindLanguages': parseInt($('#IdKindLanguages').combobox('getValue')), 'IdLevelKnowledge': parseInt($('#IdLevelKnowledge').combobox('getValue')), 'MaxCountStudents': parseInt($('#MaxCountStudents').numberbox('getValue')), 'Notes': $('#Notes').textbox('getValue') });
+            }
+            else {
+                msg = JSON.stringify({ 'GroupName': $('#GroupName').textbox('getValue'), 'IdKindLanguages': parseInt($('#IdKindLanguages').combobox('getValue')), 'IdLevelKnowledge': parseInt($('#IdLevelKnowledge').combobox('getValue')), 'MaxCountStudents': parseInt($('#MaxCountStudents').numberbox('getValue')), 'Notes': $('#Notes').textbox('getValue') });
+            }
+
+            $.ajax({
+                type: "POST",
+                url: url2,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: msg,
+                contentType: "application/json",
+                traditional: true,
+                dataType: "json",
+                success: function (res) {
+                    $.messager.alert('Information', res.text, 'info');
+                    if (res.text == "Group added successfully!") {
+                        $('#fm').form('clear'); $('#new_group').dialog('close');
+                        $('#dg_groups').datagrid('reload');
+                    }
+                    if (res.text == "Group edited successfully!") {
+                        $('#fm').form('clear'); $('#new_group').dialog('close');
+                        $('#dg_groups').datagrid('reload');
+                    }
+
+                }, error: function () { alert("Did not work"); }
+            });
+        }
+
+        function delGroup() {
+            $.messager.confirm('Attention!', 'Are you sure you want to delete group?', function (r) {
+                if (r) {
+                    row2 = $('#dg_groups').datagrid('getSelected');
+                    if (row2) {
+                        $.ajax({
+                            type: "POST",
+                            url: '/Admin/DelGroup/',
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("XSRF-TOKEN",
+                                    $('input:hidden[name="__RequestVerificationToken"]').val());
+                            },
+                            data: JSON.stringify({ 'Id': parseInt(row2.Id) }),
+                            contentType: "application/json",
+                            traditional: true,
+                            dataType: "json",
+                            success: function (res) {
+                                $.messager.alert('Information', res.text, 'info');
+                                if (res.text == "Group deleted successfully!") {
+                                    $('#dg_groups').datagrid('reload');
+                                }
+                            }, error: function () { alert("Did not work"); }
+                        });
+                    }
+                }
+            });
+        }
+    </script>
+
+    <script>
+        function openWindowAddStudent() {
+            var rowGr = $('#dg_groups').datagrid('getSelected');
+            if (rowGr) {
+                $('#dlg_add_student').window('open').dialog('center').dialog('setTitle', 'Including students to group');
+                $('#dg_add_student').datagrid({ url: '/Admin/LoadStudents/' });
+            }
+            else {
+                $.messager.alert('Information', "You haven't selected a group.", 'info');
+            }
+        }
+    </script>
+
+    <script>
+        function addStud2Group() {
+            row = $('#dg_groups').datagrid('getSelected');
+            if (row) {
+                stud = $('#dg_add_student').datagrid('getSelected');
+                $.ajax({
+                    type: "POST",
+                    url: '/Admin/AddStudent2Group/',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: JSON.stringify({ 'IdGroups': parseInt(row.Id), 'IdStudent': stud.Id }),
+                    contentType: "application/json",
+                    traditional: true,
+                    dataType: "json",
+                    success: function (res) {
+                        $.messager.alert('Information', res.text, 'info');
+                        if (res.text == "Student added successfully!") {
+                            $('#dlg_add_student').dialog('close');
+                            $('#list_of_students').datagrid('reload');
+                        }
+                    }, error: function () { alert("Did not work"); }
+                });
+            }
+        }
+    </script>
+
+    <script>
+        $(function () {
+            $('#dg_groups').datagrid({
+                onSelect: function (index) {
+                    var row = $('#dg_groups').datagrid('getSelected');
+                    //Load and output list of students in a group
+                    $('#list_of_students').datagrid({
+                        method: 'get',
+                        queryParams: {
+                            Id: row.Id
+                        },
+                        showHeader: true,
+                        scrollbarSize: 0,
+                        striped: true,
+                        border: false,
+                        singleSelect: true,
+                        url: '/Admin/GetStudentsInGroup/',
+                        columns: [[
+                            { field: 'IdStudent', title: 'IdStudent', hidden: true },
+                            { field: 'UserName', title: '<b>Student Name</b>' }
+
+                        ]]
+                    });
+                    //////////////////////////////////////////
+
+                    //Load and output list of teacher in a group
+                    $('#list_of_teacher').datagrid({
+                        method: 'get',
+                        queryParams: {
+                            Id: row.Id
+                        },
+                        showHeader: true,
+                        scrollbarSize: 0,
+                        striped: true,
+                        border: false,
+                        singleSelect: true,
+                        url: '/Admin/GetTeacherInGroup/',
+                        columns: [[
+                            { field: 'IdTeacher', title: 'IdTeacher', hidden: true },
+                            { field: 'UserName', title: '<b>Teacher Name</b>' }
+
+                        ]]
+                    });
+                    //////////////////////////////////////////
+                }
+            });
+        });
+    </script>
+
+
+    <script>
+        function delStudFromGr() {
+            var rowGr = $('#dg_groups').datagrid('getSelected');
+            if (rowGr) {
+                var rowStudent = $('#list_of_students').datagrid('getSelected');
+                if (rowStudent) {
+                    $.messager.confirm('Attention!', 'Are you sure you want to exclude student from group?', function (r) {
+                        if (r) {
+                            $.ajax({
+                                type: "POST",
+                                url: '/Admin/DelStudentFromGroup/',
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader("XSRF-TOKEN",
+                                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                                },
+                                data: JSON.stringify({ 'IdGroups': parseInt(rowGr.Id), 'IdStudent': rowStudent.IdStudent }),
+                                contentType: "application/json",
+                                traditional: true,
+                                dataType: "json",
+                                success: function (res) {
+                                    $.messager.alert('Information', res.text, 'info');
+                                    if (res.text == "Student excluded successfully!") {
+                                        $('#list_of_students').datagrid('reload');
+                                    }
+                                }, error: function () { alert("Did not work"); }
+                            });
+                        }
+                    });
+                }
+                else {
+                    $.messager.alert('Information', "You haven't selected a student.", 'info');
+                }
+            }
+            else {
+                $.messager.alert('Information', "You haven't selected a group.", 'info');
+            }
+
+        }
+    </script>
+
+
+    <script>
+        function delTeacherFromGr() {
+            var rowGr = $('#dg_groups').datagrid('getSelected');
+            if (rowGr) {
+                var rowTeacher = $('#list_of_teacher').datagrid('getSelected');
+                if (rowTeacher) {
+                    $.messager.confirm('Attention!', 'Are you sure you want to exclude teacher from group? Group will be unavailable for further lessons!', function (r) {
+                        if (r) {
+                            $.ajax({
+                                type: "POST",
+                                url: '/Admin/DelTeacherFromGroup/',
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader("XSRF-TOKEN",
+                                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                                },
+                                data: JSON.stringify({ 'IdGroups': parseInt(rowGr.Id), 'IdTeacher': rowTeacher.IdTeacher }),
+                                contentType: "application/json",
+                                traditional: true,
+                                dataType: "json",
+                                success: function (res) {
+                                    $.messager.alert('Information', res.text, 'info');
+                                    if (res.text == "Teacher excluded successfully!") {
+                                        $('#list_of_teacher').datagrid('reload');
+                                    }
+                                }, error: function () { alert("Did not work"); }
+                            });
+                        }
+                    });
+                }
+                else {
+                    $.messager.alert('Information', "You haven't selected a teacher.", 'info');
+                }
+            }
+            else {
+                $.messager.alert('Information', "You haven't selected a group.", 'info');
+            }
+
+        }
+    </script>
+
+
+    <script>
+        function openWindowAddTeacher() {
+            var rowGr = $('#dg_groups').datagrid('getSelected');
+            if (rowGr) {
+                $('#dlg_add_teacher').window('open').dialog('center').dialog('setTitle', 'Add teacher to group');
+            }
+            else {
+                $.messager.alert('Information', "You haven't selected a group.", 'info');
+            }
+        }
+    </script>
+
+
+    <script>
+        function addTeacher2Group() {
+            row = $('#dg_groups').datagrid('getSelected');
+            if (row) {
+                $.ajax({
+                    type: "POST",
+                    url: '/Admin/AddTeacher2Group/',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: JSON.stringify({ 'IdTeacher': $('#IdTeacher').combobox('getValue'), 'IdGroups': parseInt(row.Id) }),
+                    contentType: "application/json",
+                    traditional: true,
+                    dataType: "json",
+                    success: function (res) {
+                        $.messager.alert('Information', res.text, 'info');
+                        if (res.text == "Teacher added successfully!") {
+                            $('#dlg_add_teacher').dialog('close');
+                        }
+                    }, error: function () { alert("Did not work"); }
+                });
+            }
+        }
+    </script>
+
+
+</head>
+
+<body class="easyui-layout">
+
+    <div data-options="region:'north',border:true" style="height: 100px; background: #d7ebf9; padding: 10px;">
+        <h1 class="shd">Administration room</h1>
+        <div class="btn_div" style="margin-top:20px;">
+            <a href="#" class="button" onClick="confirm1();">Logout</a>
+        </div>
+    </div>
+
+    <div data-options="region:'west', split:false" style="width:202px;">
+
+        <!--Display menu -->
+        <div id='cssmenu'>
+            <ul>
+                <li class='has-sub'>
+                    <a href='#'><span>Main</span></a>
+                    <ul>                        
+                        <li class='last'><a href='@Url.ActionLink("Index", "Users")'><span>Users</span></a></li>
+                        <li class='last'><a href='@Url.ActionLink("Index", "Roles")'><span>User roles</span></a></li>
+                        <li><a href='@Url.ActionLink("Groups", "Admin")'><span>Groups</span></a></li>
+                        <li><a href='@Url.ActionLink("LevelKnowledge", "Admin")'><span>Level of knowledge</span></a></li>
+                        <li class='last'><a href='@Url.ActionLink("KindLanguages", "Admin")'><span>Kind of languages</span></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div data-options="region:'center'" style="padding:5px;background:#eee;">
+        @RenderBody()
+    </div>
+
+   
+    
+    @if (IsSectionDefined("Gr_details"))
+    { 
+        //Show details about group here in template if section Ge_details declared in view which use this template(Layout) 
+        @RenderSection("Gr_details", required: true)        
+    }
+
+    
+
+</body>
+
+</html>

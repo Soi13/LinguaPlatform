@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityRole>
+
+@Html.AntiForgeryToken()
+
+@{
+    ViewBag.Title = "List of roles";
+    Layout = "~/Views/Shared/_Layout_admin.cshtml";
+}
+
+<h2>List of roles</h2>
+<table class="table">
+    @foreach (var role in Model)
+    {
+        <tr>
+            <td>@role.Name</td>
+            <td>
+                <form asp-action="Delete" asp-route-id="@role.Id" method="post">
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>
+<a asp-action="Create">Add role</a>
+<a style="margin-left:50px;" asp-action="UserList">Users list</a>

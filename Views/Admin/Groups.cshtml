@@ -1,0 +1,141 @@
+﻿@{
+    ViewData["Title"] = "Groups";
+    Layout = "~/Views/Shared/_Layout_admin.cshtml";
+}
+
+@Html.AntiForgeryToken()
+
+<table id="dg_groups" title="Groups" class="easyui-datagrid" style="width:100%;height:100%"
+       method="get"
+       url="/Admin/GetGroups"
+       toolbar="#toolbar"
+       rownumbers="true" fitColumns="true" singleSelect="true" pagination="true" sortName="GroupName" sortOrder="asc" idField="Id" striped=true>
+
+    <thead>
+        <tr>
+            <th field="Id" width="15" hidden="true">ID1</th>
+            <th field="GroupName" width="150" sortable="true">Group name</th>
+            <th field="IdKindLanguages" width="150" sortable="true">Language</th>
+            <th field="IdLevelKnowledge" width="150" sortable="true">Level</th>
+
+        </tr>
+    </thead>
+</table>
+<div id="toolbar">
+    <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newGroup()">Add new group</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editGroup()">Edit group</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="delGroup()">Delete group</a>
+</div>
+
+<!--Form for adding a new group -->
+<div id="new_group" class="easyui-dialog" style="width:500px;height:420px;padding:10px 1px;"
+     closed="true" buttons="#dlg-buttons" data-options="openDuration:400, closeDuration:400, closeAnimation:'fade', openAnimation:'fade'">
+    <div class="ftitle"><span id="tit">Add a new group</span></div>
+    <form id="fm">
+        <div class="fitem">
+            <label>Name of group:</label>
+            <input id="GroupName" name="GroupName" class="easyui-textbox" required missingMessage="This field must be filled.">
+        </div>
+        <div class="fitem">
+            <label>Language:</label>
+            <input id="IdKindLanguages" name="IdKindLanguages" class="easyui-combobox" data-options="required:true, editable:false, panelHeight:'auto', valueField: 'id', textField: 'text', url: '/Admin/LoadLanguages/', method: 'get'">
+        </div>
+        <div class="fitem">
+            <label>Level of knowledge:</label>
+            <input id="IdLevelKnowledge" name="IdLevelKnowledge" class="easyui-combobox" data-options="required:true, editable:false, panelHeight:'auto', valueField: 'id', textField: 'text', url: '/Admin/LoadLevels/', method: 'get'">
+        </div>
+        <div class="fitem">
+            <label>Count of students:</label>
+            <input id="MaxCountStudents" name="MaxCountStudents" class="easyui-numberbox" data-options="min:0, max:10">
+        </div>
+        <div class="fitem">
+            <label>Notes:</label>
+            <input id="Notes" name="Notes" class="easyui-textbox" data-options="multiline:true" style="height:50px">
+        </div>
+
+    </form>
+</div>
+<div id="dlg-buttons">
+    <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveGroup()" style="width:100px">Ok</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#new_group').dialog('close')" style="width:90px">Cancel</a>
+</div>
+<!-- End of Form for adding a new group -->
+
+<!-- Form for incliding students to group -->
+<div id="dlg_add_student" class="easyui-dialog" style="width:370px;height:500px;padding:10px 5px 0px 5px;"
+     closed="true" modal="true" buttons="#dlg-buttons_stud" data-options="openDuration:400, closeDuration:400, closeAnimation:'fade', openAnimation:'fade'">
+    <table id="dg_add_student" class="easyui-datagrid" style="width:100%;height:75%"
+           method="get" rownumbers="true" fitColumns="true" sortName="UserName" sortOrder="asc" striped=true>
+        <thead>
+            <tr>
+                <th field="ck_bx" checkbox="true"></th>
+                <th field="Id" width="10" sortable="true" hidden="true">Id</th>
+                <th field="UserName" width="100" sortable="true">User name</th>
+                <th field="Email" width="100" sortable="true">Email</th>
+            </tr>
+        </thead>
+    </table>
+
+</div>
+<div id="dlg-buttons_stud">
+    <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="addStud2Group()" style="width:100px">Ok</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg_add_student').dialog('close')" style="width:90px">Cancel</a>
+</div>
+<!-- End Form for incliding students to group -->
+
+
+<!-- Form for incliding teacher to group -->
+<div id="dlg_add_teacher" class="easyui-dialog" style="width:470px;height:200px;padding:10px 5px 0px 5px;"
+     closed="true" modal="true" buttons="#dlg-buttons_teach" data-options="openDuration:400, closeDuration:400, closeAnimation:'fade', openAnimation:'fade'">
+    <div class="fitem">
+        <label>Teacher:</label>
+        <input id="IdTeacher" name="IdTeacher" class="easyui-combobox" data-options="required:true, editable:false, panelHeight:'auto', valueField: 'id', textField: 'text', url: '/Admin/LoadTeachers/', method: 'get'">
+    </div>
+</div>
+<div id="dlg-buttons_teach">
+    <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="addTeacher2Group()" style="width:100px">Ok</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg_add_teacher').dialog('close')" style="width:90px">Cancel</a>
+</div>
+<!-- End Form for incliding teacher to group -->
+
+
+
+
+
+
+
+@section Gr_details {
+
+    <div data-options="region:'east', split:true" style="padding:5px;background:#eee; width:20%;">
+        <div class="easyui-tabs" style="width:100%; height:auto;" data-options="narrow:true, fit:true">
+            <div title="Students">
+                <div style="padding:10px 10px;">
+                    <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="openWindowAddStudent()">Add student</a>
+                    <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="delStudFromGr()">Remove student</a>
+                </div>
+                <table id="list_of_students"></table>
+            </div>
+            <div title="Teacher">
+                <div style="padding:10px 10px;">
+                    <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="openWindowAddTeacher()">Add teacher</a>
+                    <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="delTeacherFromGr()">Remove teacher</a>
+                </div>
+                <table id="list_of_teacher"></table>
+            </div>
+            <div title="Lessons generator">
+                <div style="padding:10px 10px;">
+                    <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="open_window_create_lessons()">Create lessons</a>
+                    <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-edit'" onclick="open_window_edit_lessons()">Edit lessons</a>
+                    <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="del_lessons()">Delete lessons</a>
+                </div>
+                <table id="list_of_lessons"></table>
+                <table id="list_of_periods_of_lessons"></table>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+}

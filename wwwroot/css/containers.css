@@ -1,0 +1,66 @@
+﻿#video1, #video2 {
+    position: relative;
+    width: auto;
+    height: 30%;
+    z-index: 9999;
+}
+
+#subscriber {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+}
+
+#publisher {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    bottom: 0px;
+    left: 0px;
+    z-index: 999;
+    border: 3px solid white;
+    border-radius: 3px;
+}
+
+#share_subscriber, #share_publisher {
+    position: absolute; 
+    width: 100%;
+    height: 100%;
+}
+
+#share_sub {
+    /*position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;*/
+
+    /*position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(136, 136, 204, 0.5);
+    z-index: 4444;*/
+}
+
+#share_pub {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    margin-bottom: 2px;
+    margin-left: 2px;
+    width: 100%;
+    height: 100%;
+}
+
+#whiteboard {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}

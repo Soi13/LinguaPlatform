@@ -1,0 +1,545 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - LinguaPlatform</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=11">
+    <meta http-equiv="X-UA-Compatible" content="IE=10">
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta http-equiv="X-UA-Compatible" content="IE=8">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/easyui.css?v=1">
+    <link rel="stylesheet" type="text/css" href="~/css/icon.css">
+    <link rel="stylesheet" type="text/css" href="~/css/demo.css">
+    <link rel="stylesheet" type="text/css" href="~/css/color.css">
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="~/css/app.css">
+    <link rel="stylesheet" type="text/css" href="~/css/containers.css">
+
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/jquery.easyui.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/script.js"></script>
+    <script src="~/js/checkbrowser.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
+    <script src="~/js/opentok-layout.js"></script>
+    <script src="~/js/microsoft/signalr/dist/browser/signalr.js"></script>
+   
+    
+    <script>
+        function confirm1() {
+            $.messager.confirm('Attention!', 'Are you sure you want to exit?', function (r) {
+                if (r) {
+
+                      $.ajax({
+                    type: "POST",
+                    //url: '/Account/Logout/',
+                    url: '@Url.Action("Logout", "Account")',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    contentType: "application/json",
+                    traditional: true,
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.text == true) {
+                            var link = '@Url.ActionLink("Login", "Account")';
+                            window.location.href = link;
+
+                        }
+                        else {
+                            $.messager.alert('Information', res.text, 'info');
+                        }
+                    }, error: function () { alert("Did not work"); }
+                });
+
+                }
+            });
+        }
+    </script>
+
+    <script>
+                function conncect2Session() {
+                    $.ajax({
+                        type: "POST",
+                        url: '/Teacher/Connect2Session/',
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("XSRF-TOKEN",
+                                $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        data: JSON.stringify({ 'Id': parseInt($('#GrLes').combobox('getValue')) }),
+                        contentType: "application/json",
+                        traditional: true,
+                        dataType: "json",
+                        success: function (res) {
+                            if (res.err == true) {
+                                $.messager.alert('Attention', "You haven't selected group for a lesson!", 'warning');
+                                return;
+                            }
+                            else {
+                                initializeSession(res.apiKey, res.sessionId, res.token);
+                            }
+                        }, error: function () { alert("Did not work"); }
+                    });
+
+                }
+    </script>
+
+
+    <script>
+                function makeCloseWestPanel() {
+                    ////////////////////
+                    var c = $('#inner_cont');            // layout
+                    var p = c.layout('panel', 'west');   // get the west panel
+                    p.panel('resize', {width: 1 });
+                    c.layout('resize');
+                    /////////////////////
+                }
+
+                function getWidthCenterLayout() {
+                    //Getting width of parent center panel
+                    var p1 = $('body').layout('panel', 'center');  // get the west panel
+                    var width_layout = p1.panel('options').width;  // output the panel's width
+                    //console.log(p1.width());  // output the panel's inner width
+                    return width_layout;
+                }
+
+
+                let status_wb = "false";
+                function openBoard() {
+                    if (!st) {
+                    $.messager.alert("Attention", "Since you haven't connected to lesson you can't use whiteboard!", "info");
+                        return;
+                    }
+
+                    $.ajax({
+                    type: "POST",
+                        url: '/Teacher/WhiteBoard/',
+                        beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                        },
+                        contentType: "application/json",
+                        traditional: true,
+                        dataType: "json",
+                        success: function (res) {
+                            var opts = $('#brd_but').linkbutton('options');
+                            if (opts.selected) {
+                    $('#brd_but').linkbutton({ text: 'Open whiteboard', selected: false });
+                                status_wb = "false";
+                                makeCloseWestPanel();
+                            } else {
+                    $('#brd_but').linkbutton({ text: 'Close whiteboard', selected: true });
+
+                                var ww = getWidthCenterLayout();
+
+                                var c = $('#inner_cont');            // layout
+                                var p = c.layout('panel', 'west');   // get the west panel
+                                p.panel('resize', {width: ww });
+                                c.layout('resize');
+                                status_wb = "true";
+                                document.getElementById('whiteboard').src = res.wbu;
+
+                            }
+                        }, error: function () {alert("Did not work"); }
+                    });
+
+                }
+    </script>
+
+
+    <script>
+                function disconnectFromSession() {
+                    $.messager.confirm('Attention!', 'Are you sure you want to disconnect?', function (r) {
+                        if (r) {
+                            if (session != null) {
+                                console.log("unsubscribe");
+                                $.ajax({
+                                    type: "POST",
+                                    url: '/Teacher/DisconnectFromSession/',
+                                    beforeSend: function (xhr) {
+                                        xhr.setRequestHeader("XSRF-TOKEN",
+                                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                                    },
+                                    contentType: "application/json",
+                                    traditional: true,
+                                    dataType: "json",
+                                    success: function (res) {
+                                        //session.unsubscribe(subscriber)
+                                        //session.unpublish(publisher)
+                                        session.disconnect();
+                                        subscribed = [];
+                                        st = false;
+                                        $("#conn_but").linkbutton('enable');
+                                        $("#discon_but").linkbutton().hide();
+                                        $("#mic").linkbutton('disable');
+                                        $("#cam").linkbutton('disable');
+                                        $("#shr_but").linkbutton('disable');
+                                        $("#brd_but").linkbutton('disable');
+                                        var opt = $('#brd_but').linkbutton('options');
+                                        if (opt.selected) {
+                                            $('#brd_but').linkbutton({ text: 'Open whiteboard', selected: false });
+                                            makeCloseWestPanel();
+                                        }
+                                    }, error: function () { alert("Did not work"); }
+                                });
+                            }
+                        }
+                    });
+
+                }
+    </script>
+
+
+    <script>
+                //Handling all of our errors here by alerting them
+                function handleError(error) {
+                    if (error) {
+                    alert(error.message);
+                        $.messager.alert('Attention', error.message, 'error');
+                    }
+                }
+    </script>
+
+
+    <script>
+                let session;
+                let st = false;
+                let publisher;
+                let subscriber;
+                let subscribed = [];
+                let teacher_stream_Id;
+
+                /////////Initialize session
+                function initializeSession(apiKey, sessionId, token) {
+                    if (st) {
+                    $.messager.alert("Attention", "You've already connected to lesson!", "info");
+                        return;
+                    }
+
+                    session = OT.initSession(apiKey, sessionId);
+
+                    var layoutContainer = document.getElementById("subscriber");
+                    var layout = initLayoutContainer(layoutContainer).layout;
+
+                    session.on('streamCreated', function (event) {
+                    console.log("sessionCreated", event.stream.id, subscribed);
+
+                        if (subscribed.includes(event.stream.id)) {
+                    console.log("Subscriber already exits.", subscriber.id);
+                            return;
+                        }
+
+                        if (event.stream.videoType === 'screen') {
+                    subscriber = session.subscribe(event.stream, 'share_sub', {
+                        insertMode: 'append',
+                        width: '100%',
+                        height: '100%'
+                    }, handleError);
+                            makeCloseWestPanel();
+                        } else {
+                    subscriber = session.subscribe(event.stream, 'subscriber', {
+                        insertMode: 'append',
+                        width: '100%',
+                        height: '100%'
+                    }, handleError);
+                            layout();
+                        }
+
+                        subscribed.push(event.stream.id);
+                    });
+
+                    session.on('streamDestroyed', function (event) {
+                    console.log("streamDestroyed", "Unsubscribe");
+                        session.unsubscribe(subscriber);
+                        // event.preventDefault()
+
+                    });
+
+                    session.on('sessionDisconnected', function (event) {
+                    console.log("sessionDisconnected");
+                        // session.unsubscribe(subscriber)
+                        // event.preventDefault()
+                    });
+
+                    // Create a publisher
+                    publisher = OT.initPublisher('publisher', {
+                    insertMode: 'append',
+                        width: '100%',
+                        height: '100%'
+                    }, handleError);
+
+
+                    // Connect to the session
+                    session.connect(token, function (error) {
+                        // If the connection is successful, initialize a publisher and publish to the session
+                        if (error) {
+                    handleError(error);
+                        } else {
+                    session.publish(publisher, handleError);
+                            layout();
+                            st = true;
+                            $("#discon_but").linkbutton().show();
+                            $("#conn_but").linkbutton('disable');
+                            $("#mic").linkbutton('enable');
+                            $("#cam").linkbutton('enable');
+                            $("#shr_but").linkbutton('enable');
+                            $("#brd_but").linkbutton('enable');
+                        }
+                    });
+
+                    publisher.on("streamCreated", function (event) {
+                    teacher_stream_Id = event.stream.streamId;
+                    });
+
+                }
+                ////////////////////////////////////////////
+
+
+                ///////////////Share screen
+                function shareScreen() {
+                    if (!st) {
+                    $.messager.alert("Attention", "Since you haven't connected to lesson you can't use screen sharing!", "info");
+                        return;
+                    }
+
+                    OT.checkScreenSharingCapability(function (response) {
+                        if (!response.supported || response.extensionRegistered === false) {
+                    $.messager.alert('Information', "This browser does not support screen sharing.", 'warning');
+                        } else if (response.extensionInstalled === false) {
+                    $.messager.alert('Information', "You have to install extension for using screen sharing.", 'warning');
+                        } else {
+                            // Screen sharing is available. Publish the screen.
+                            var publisher = OT.initPublisher('share_pub',
+                                {videoSource: 'screen', insertMode: "append", width: "100%", height: "100%" },
+                                function (error) {
+                                    if (error) {
+                    //handleError(error);
+                } else {
+                    session.publish(publisher, handleError);
+                                        $("#bd").attr("style", "border:5px solid blue;");
+                                    }
+                                }
+                            );
+
+                            publisher.on('mediaStopped', function (event) {
+                    $("#bd").attr("style", "");
+                            });
+                        }
+                    });
+
+
+                }
+                /////////////////////////////////////////////////////////
+    </script>
+
+
+    <script>
+                $(function () {
+                    $("#mic").linkbutton({
+                        onClick: function () {
+                            var opts = $(this).linkbutton('options');
+                            if (opts.selected) {
+                                $('#mic').linkbutton({ iconCls: 'icon-mute' });
+                                publisher.publishAudio(false);
+                            }
+                            else {
+                                $('#mic').linkbutton({ iconCls: 'icon-microphone' });
+                                publisher.publishAudio(true);
+                            }
+                        }
+                    })
+                })
+
+    </script>
+
+
+    <script>
+                $(function () {
+                    $("#cam").linkbutton({
+                        onClick: function () {
+                            var opts = $(this).linkbutton('options');
+                            if (opts.selected) {
+                                $('#cam').linkbutton({ iconCls: 'icon-no-video' });
+                                publisher.publishVideo(false);
+                            }
+                            else {
+                                $('#cam').linkbutton({ iconCls: 'icon-video-camera' });
+                                publisher.publishVideo(true);
+                            }
+                        }
+                    })
+                })
+
+    </script>
+
+    <script>
+                $(function () {
+                    $("#discon_but").linkbutton().hide();
+                })
+    </script>
+
+
+    <script>
+                function downloadArch() {
+                    row = $('#dg_video_archives').datagrid('getSelected');
+                    if (row) {
+                    $.messager.confirm('Attention!', 'Are you sure you want to download archive?', function (r) {
+                        if (r) {
+                            $.ajax({
+                                type: "POST",
+                                url: '/Teacher/DownLoadArchive/',
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader("XSRF-TOKEN",
+                                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                                },
+                                data: JSON.stringify({ 'id': row.IdArch }),
+                                contentType: "application/json",
+                                traditional: true,
+                                dataType: "json",
+                                success: function (res) {
+                                    $.messager.alert('Link', res.result);
+                                }, error: function () { alert("Did not work"); }
+                            });
+
+                        }
+                    });
+                    }
+                    else {
+                    $.messager.alert('Attention', 'You have not selected archive!', 'warning');
+                    }
+
+                }
+    </script>
+
+
+    <script>
+                $(function () {
+                    const hubConnection = new signalR.HubConnectionBuilder().withUrl("/signals").build();
+                    hubConnection.on('Status_chk', function (message) {
+                        if (message[0] == "check_st_wb") {
+                            var data = [message[1], status_wb];
+                            $.ajax({
+                    type: "POST",
+                                url: '/Teacher/SendStatusWB/',
+                                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                                },
+                                data: JSON.stringify({'Status_wb': data }),
+                                contentType: "application/json",
+                                traditional: true,
+                                dataType: "json",
+                                success: function (res) {
+                }, error: function () {alert("Did not work"); }
+                            });
+                        }
+                    });
+
+                    hubConnection.start();
+                });
+    </script>
+
+
+    <script>
+                $(function () {
+                    const hubConnection1 = new signalR.HubConnectionBuilder().withUrl("/signals").build();
+                    hubConnection1.on('GetStreamId', function (message1) {
+                        if (message1[0] == "StreamId") {
+                            var data1 = [message1[1], teacher_stream_Id]
+                            $.ajax({
+                    type: "POST",
+                                url: '/Teacher/SendTeacherStreamId/',
+                                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                                },
+                                data: JSON.stringify({'StreamId': data1 }),
+                                contentType: "application/json",
+                                traditional: true,
+                                dataType: "json",
+                                success: function (res) {
+                }, error: function () {alert("Did not work"); }
+                            });
+                        }
+                    });
+
+                    hubConnection1.start();
+                });
+    </script>
+
+
+</head>
+
+<body id="bd" class="easyui-layout">
+
+    <div data-options="region:'north',border:true" style="height: auto; background: #d7ebf9; padding: 10px; text-align:right;">
+        <span style="color:blue; font-size:10pt;">@User.Identity.Name</span>
+        <div class="btn_div" style="margin-left:10px;">
+            <a href="#" class="button" onClick="confirm1();">Logout</a>
+        </div>
+    </div>
+
+    <div data-options="region:'west', split:false" style="width:202px;">
+
+        <!--Display menu -->
+        <div id='cssmenu'>
+            <ul>
+                <li><a href='@Url.ActionLink("Lessons", "Teacher")'><span>Lesson</span></a></li>
+            <!--<li><a href='@Url.ActionLink("VideoArchive", "Teacher")'><span>Archives of lessons</span></a></li>
+                  <li class='has-sub'>
+                    <a href='#'><span>Main</span></a>
+                    <ul>
+                        <li class='last'><a href='@Url.ActionLink("Lessons", "Teacher")'><span>Lesson</span></a></li>
+                        <li><a href='@Url.ActionLink("VideoArchive", "Teacher")'><span>Archives of lessons</span></a></li>
+                    </ul>
+                </li>
+                <li class='has-sub'>
+                    <a href='#'><span>Training</span></a>
+                    <ul>
+                        <li><a href='#'><span>Video practice</span></a></li>
+                        <li><a href='#'><span>Home tasks</span></a></li>
+                        <li><a href='@Url.ActionLink("Training", "Teacher")'><span>Tests</span></a></li>
+                        <li class='last'><a href='#'><span>Word games</span></a></li>
+                    </ul>
+                </li>
+                <li class='has-sub'>
+                    <a href='#'><span>Program</span></a>
+                    <ul>
+                        <li><a href='#'><span>My notes</span></a></li>
+                        <li><a href='#'><span>My dictionary</span></a></li>
+                        <li class='last'><a href='#'><span>My portfolio</span></a></li>
+                    </ul>
+                </li>
+                <li><a href='#'><span>Additionals</span></a></li>   -->
+            </ul>
+        </div>
+
+    </div>
+
+    <div data-options="region:'center'" style="padding:5px;background:#eee;">
+        @RenderBody()
+    </div>
+
+    @if (IsSectionDefined("Eastern_panel"))
+    {
+        //Show details about group here in template if section Ge_details declared in view which use this template(Layout)
+        @RenderSection("Eastern_panel", required: true)
+    }
+
+    @if (IsSectionDefined("Southern_panel"))
+    {
+        //Show details about group here in template if section Ge_details declared in view which use this template(Layout)
+        @RenderSection("Southern_panel", required: true)
+    }
+
+
+
+</body>
+
+</html>

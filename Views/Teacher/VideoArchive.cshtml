@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Teacher - VideoArchive";
+    Layout = "~/Views/Shared/_Layout_teacher.cshtml";
+}
+
+@Html.AntiForgeryToken()
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div style="background-color:pink; font-size:12pt; font-weight:500; text-align:center; padding:10px;">
+        <span>Archives are available for 30 days from the time they are created.</span>
+    </div>
+
+    <table id="dg_video_archives" title="Video archives of lessons" class="easyui-datagrid" style="width:100%;height:90%"
+           method="get"
+           url="/Teacher/GetArchs"
+           rownumbers="true" fitColumns="true" singleSelect="true" sortName="GroupName" sortOrder="asc" idField="Id" striped=true>
+        <thead>
+            <tr>
+                <th field="Id" width="15" hidden="true">Id</th>
+                <th field="IdArch" width="15" hidden="true">IdArch</th>
+                <th field="SessionId" width="15" hidden="true">IdSession</th>
+                <th field="GroupName" width="150" sortable="true"><b>Group name</b></th>
+                <th field="DatetimeCreate" width="150" sortable="true"><b>Created</b></th>
+
+            </tr>
+        </thead>
+    </table>
+    
+    <div style="text-align:center; padding:10px;">
+        <a id = "arch" href = "#" class="easyui-linkbutton c5" data-options="iconCls:'icon-download'" style="width:200px;" onclick="downloadArch()">Get link</a> 
+    </div>
+
+
+
+}
